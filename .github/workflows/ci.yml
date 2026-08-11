@@ -35,3 +35,27 @@ jobs:
 
       - name: Gerar build
         run: npm run build
+
+  terraform:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Inicializar Terraform
+        working-directory: terraform
+        run: terraform init
+
+      - name: Verificar formatação
+        working-directory: terraform
+        run: terraform fmt -check
+
+      - name: Validar Terraform
+        working-directory: terraform
+        run: terraform validate
