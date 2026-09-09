@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+.git
+.github
+coverage
+.env
+*.tfvars
+dist
+tests
+*.md
+.gitignore
+cd
