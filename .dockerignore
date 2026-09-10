@@ -5,7 +5,6 @@ npm-debug.log
 coverage
 .env
 *.tfvars
-dist
 tests
 *.md
 .gitignore
