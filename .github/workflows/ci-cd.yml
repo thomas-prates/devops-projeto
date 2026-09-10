@@ -139,6 +139,10 @@ jobs:
       - name: Health Check
         if: success()
         run: |
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ] || [ -z "${{ secrets.SERVER_IP }}" ]; then
+            echo "Secrets de deploy não configurados. Pulando health check."
+            exit 0
+          fi
           sleep 10
           curl --fail --silent --show-error "http://${{ secrets.SERVER_IP }}:3000/health"
 
