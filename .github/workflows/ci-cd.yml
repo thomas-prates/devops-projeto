@@ -110,7 +110,7 @@ jobs:
     name: Deploy to Production
     runs-on: ubuntu-latest
     needs: [build-image]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.SSH_PRIVATE_KEY != '' && secrets.SERVER_IP != ''
 
     steps:
       - name: Checkout do código
@@ -121,15 +121,15 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Deploy no servidor
         env:
           IMAGE: ghcr.io/thomas-prates/devops-projeto:latest
           PORT: 3000
         run: |
-          scp -i ~/.ssh/deploy_key scripts/deploy.sh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/
-          ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "chmod +x /tmp/deploy.sh && IMAGE=$IMAGE PORT=$PORT /tmp/deploy.sh"
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no scripts/deploy.sh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "chmod +x /tmp/deploy.sh && IMAGE=$IMAGE PORT=$PORT /tmp/deploy.sh"
 
       - name: Health Check
         run: |
@@ -140,7 +140,7 @@ jobs:
     name: Smoke Tests
     runs-on: ubuntu-latest
     needs: [deploy]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.SSH_PRIVATE_KEY != '' && secrets.SERVER_IP != ''
 
     steps:
       - name: Testar API
