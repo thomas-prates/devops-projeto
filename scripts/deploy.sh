@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE="${IMAGE:-ghcr.io/SEU-USUARIO/devops-projeto:latest}"
+IMAGE="${IMAGE:-ghcr.io/thomas-prates/devops-projeto:latest}"
 CONTAINER="devops-projeto"
 PORT="${PORT:-3000}"
 

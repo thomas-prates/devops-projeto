@@ -11,6 +11,10 @@ on:
       - main
       - develop
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   ci:
     name: Continuous Integration
@@ -86,7 +90,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/thomas-prates/devops-projeto
           tags: |
             type=ref,event=branch
             type=sha,prefix={{branch}}-
@@ -121,7 +125,7 @@ jobs:
 
       - name: Deploy no servidor
         env:
-          IMAGE: ghcr.io/${{ github.repository }}:latest
+          IMAGE: ghcr.io/thomas-prates/devops-projeto:latest
           PORT: 3000
         run: |
           scp -i ~/.ssh/deploy_key scripts/deploy.sh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/

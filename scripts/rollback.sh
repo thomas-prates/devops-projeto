@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PREVIOUS_IMAGE="${PREVIOUS_IMAGE:-ghcr.io/SEU-USUARIO/devops-projeto:previous}"
+PREVIOUS_IMAGE="${PREVIOUS_IMAGE:-ghcr.io/thomas-prates/devops-projeto:previous}"
 CONTAINER="devops-projeto"
 PORT="${PORT:-3000}"
 
