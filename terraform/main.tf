@@ -80,12 +80,12 @@ resource "aws_route_table_association" "public" {
 
 resource "aws_security_group" "server" {
   name        = "${var.project_name}-security-group"
-  description = "Regras de acesso da aplicação"
+  description = "Application access rules"
   vpc_id      = aws_vpc.main.id
 
   # SSH
   ingress {
-    description = "Acesso SSH"
+    description = "SSH access"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -94,14 +94,14 @@ resource "aws_security_group" "server" {
 
   # API
   ingress {
-    description = "Acesso a API"
+    description = "API access"
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Saída para internet
+  # Internet egress
   egress {
     from_port   = 0
     to_port     = 0
@@ -135,6 +135,7 @@ resource "aws_instance" "server" {
   subnet_id                   = aws_subnet.public.id
   vpc_security_group_ids      = [aws_security_group.server.id]
   associate_public_ip_address = true
+  key_name                    = "devops-projeto-key"
 
   user_data = <<-EOF
     #!/bin/bash

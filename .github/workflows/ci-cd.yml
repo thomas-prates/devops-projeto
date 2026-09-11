@@ -131,6 +131,7 @@ jobs:
           if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ] || [ -z "${{ secrets.SERVER_IP }}" ]; then
             echo "Secrets de deploy não configurados. Pulando deploy."
             echo "Configure SSH_PRIVATE_KEY, SERVER_IP e SERVER_USER nos secrets do GitHub."
+            echo "Instancia EC2 disponível em: 54.20.71.137"
             exit 0
           fi
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no scripts/deploy.sh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/

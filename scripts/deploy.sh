@@ -22,3 +22,4 @@ sleep 5
 curl --fail --silent --show-error "http://127.0.0.1:${PORT}/health" > /dev/null
 
 echo "Deploy concluído com sucesso."
+echo "A aplicação está disponível em: http://18.231.121.90:3000"

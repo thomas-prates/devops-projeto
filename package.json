@@ -2,12 +2,12 @@
   "name": "devops-projeto",
   "version": "1.0.0",
   "description": "Task DevOps API - Projeto acadêmico de DevOps",
-  "main": "dist/server.js",
+  "main": "dist/src/server.js",
   "scripts": {
     "build": "tsc",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "dev": "ts-node src/server.ts"
   },
   "keywords": [
