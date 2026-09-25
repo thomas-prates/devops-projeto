@@ -116,6 +116,24 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
+      # Falha explicitamente se algum secret estiver ausente, para que o job
+      # nunca fique verde sem ter feito o deploy de verdade.
+      - name: Verificar secrets de deploy
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          missing=""
+          [ -z "$SSH_PRIVATE_KEY" ] && missing="$missing SSH_PRIVATE_KEY"
+          [ -z "$SERVER_IP" ] && missing="$missing SERVER_IP"
+          [ -z "$SERVER_USER" ] && missing="$missing SERVER_USER"
+          if [ -n "$missing" ]; then
+            echo "::error::Secrets de deploy ausentes:$missing (Settings > Secrets and variables > Actions)"
+            exit 1
+          fi
+          echo "Secrets de deploy configurados. Destino: $SERVER_USER@$SERVER_IP"
+
       - name: Configurar SSH
         run: |
           mkdir -p ~/.ssh
@@ -128,22 +146,11 @@ jobs:
           IMAGE: ghcr.io/thomas-prates/devops-projeto:latest
           PORT: 3000
         run: |
-          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ] || [ -z "${{ secrets.SERVER_IP }}" ]; then
-            echo "Secrets de deploy não configurados. Pulando deploy."
-            echo "Configure SSH_PRIVATE_KEY, SERVER_IP e SERVER_USER nos secrets do GitHub."
-            echo "Instancia EC2 disponível em: 18.231.121.90"
-            exit 0
-          fi
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no scripts/deploy.sh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "chmod +x /tmp/deploy.sh && IMAGE=$IMAGE PORT=$PORT /tmp/deploy.sh"
 
       - name: Health Check
-        if: success()
         run: |
-          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ] || [ -z "${{ secrets.SERVER_IP }}" ]; then
-            echo "Secrets de deploy não configurados. Pulando health check."
-            exit 0
-          fi
           sleep 10
           curl --fail --silent --show-error "http://${{ secrets.SERVER_IP }}:3000/health"
 
@@ -156,10 +163,6 @@ jobs:
     steps:
       - name: Testar API
         run: |
-          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ] || [ -z "${{ secrets.SERVER_IP }}" ]; then
-            echo "Secrets de deploy não configurados. Pulando smoke tests."
-            exit 0
-          fi
           # Testar health endpoint
           curl --fail --silent --show-error "http://${{ secrets.SERVER_IP }}:3000/health"
 
